@@ -8,14 +8,34 @@ class Github {
 
     async getUser(user) {
         const profileResponse = await fetch(`https://api.github.com/users/${user}?client_id=${this.client_id}&client_secret=${this.client_sectret}`);
-        const profile = await profileResponse.json();
+        const profileData = await profileResponse.json();
+        const profile = {
+            avatarUrl: profileData.avatar_url,
+            publicRepositoriesCount: profileData.public_repos,
+            publicGistsCount: profileData.public_gists,
+            followersCount: profileData.followers,
+            followingCount: profileData.following,
+            companyName: profileData.company,
+            blogUrl: profileData.blog,
+            location: profileData.location,
+            createdAt: profileData.created_at
+        };
 
-        const repoResponse = await fetch(`https://api.github.com/users/${user}/repos?per_page=${this.repos_count}&sort=${this.repos_sort}&client_id=${this.client_id}&client_secret=${this.client_sectret}`);
-        const repos = await repoResponse.json();
+        const repositoryResponse = await fetch(`https://api.github.com/users/${user}/repos?per_page=${this.repos_count}&sort=${this.repos_sort}&client_id=${this.client_id}&client_secret=${this.client_sectret}`);
+        const repositoryData = await repositoryResponse.json();
+        const repositories = repositoryData.map((data) => {
+            return {
+                url: data.html_url,
+                name: data.name,
+                watchersCount: data.watchers_count,
+                starsCount: data.stargazers_count,
+                forksCount: data.forks_count,
+            }
+        });
 
         return {
             profile,
-            repos
+            repositories
         }
     }
 }
